@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+
+enum UserType {
+  INDIVIDUAL
+  GOVERNMENT_ORG
+  NONPROFIT_ORG
+  PRODUCTION_COMPANY
+  SERVICE_COMPANY
+  TRADING_COMPANY
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum PlatformType {
+  PRODUCT_MARKETPLACE
+  SERVICE_MARKETPLACE
+  TENDER_SYSTEM
+  HR_PLATFORM
+}
+
+enum PlatformRole {
+  BUYER
+  SELLER
+  PROVIDER
+  CLIENT
+  BIDDER
+  ISSUER
+  APPLICANT
+  EMPLOYER
+  BOTH
+}
+
+model UserProfile {
+  id          String      @id @default(uuid())
+  userId      String      @unique @map("user_id")
+  
+  // Basic Info
+  userType    UserType    @map("user_type")
+  status      UserStatus  @default(ACTIVE)
+  
+  // Profile Data
+  firstName   String?     @map("first_name")
+  lastName    String?     @map("last_name")
+  bio         String?     @db.Text
+  avatarUrl   String?     @map("avatar_url")
+  
+  // Address (common for all)
+  country     String      @default("Nepal")
+  province    String?
+  district    String?
+  city        String?
+  addressLine String?     @map("address_line")
+  postalCode  String?     @map("postal_code")
+  
+  preferences Json?       @default("{}")
+  
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  platformAccess PlatformAccess[]
+
+  @@map("user_profiles")
+}
+
+model PlatformAccess {
+  id                String        @id @default(uuid())
+  userId            String        @map("user_id")
+  userProfile       UserProfile   @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  
+  platform          PlatformType
+  role              PlatformRole
+  enabled           Boolean       @default(true)
+  
+  // KYC for this platform
+  kycCompleted      Boolean       @default(false) @map("kyc_completed")
+  kycSubmittedAt    DateTime?     @map("kyc_submitted_at")
+  
+  // Usage tracking
+  totalListings     Int           @default(0) @map("total_listings")
+  totalPurchases    Int           @default(0) @map("total_purchases")
+  totalApplications Int           @default(0) @map("total_applications")
+  totalBids         Int           @default(0) @map("total_bids")
+  
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  
+  @@unique([userId, platform])
+  @@index([userId])
+  @@index([platform])
+  @@map("platform_access")
+}
