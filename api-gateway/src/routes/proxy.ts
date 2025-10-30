@@ -1,4 +1,3 @@
-// api-gateway/src/routes/proxy.ts
 
 import { Router } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';

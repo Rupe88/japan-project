@@ -10,7 +10,7 @@ import { createErrorResponse } from '../../shared/utils';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8000;
 
 // trust proxy (important for reverse proxies)
 app.set('trust proxy', 1);
@@ -44,6 +44,7 @@ app.use(gatewayAuth);
 
 // setup proxy routes
 app.use(proxyRoutes);
+
 
 //Gloval error handler
 app.use(
