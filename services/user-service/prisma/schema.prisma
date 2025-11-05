@@ -107,5 +107,5 @@ model PlatformAccess {
   @@unique([userId, platform])
   @@index([userId])
   @@index([platform])
-  @@map("platform_access")
+  @@map("platform_access")  
 }
