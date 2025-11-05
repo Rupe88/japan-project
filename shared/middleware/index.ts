@@ -35,7 +35,7 @@ export function authenticateToken(
       return res.status(403).json(createErrorResponse('Invalid token'));
     }
 
-    req.user = decoded as JWTPayload; 
+    req.user = decoded as JWTPayload;
     next();
   });
 }
@@ -96,8 +96,16 @@ export function errorHandler(
 }
 
 export function corsOptions() {
+  const allowedOrigins = ['http://localhost:3000', 'https://btbaj.vercel.app'];
+
   return {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: (origin: string | undefined, callback: Function) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: process.env.CORS_CREDENTIALS === 'true',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -107,5 +115,3 @@ export function corsOptions() {
 export function healthCheck(req: Request, res: Response) {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 }
-
-
