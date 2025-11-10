@@ -223,7 +223,6 @@ router.post(
   hrController.transferCoins
 );
 
-// ========== HR DATA DASHBOARD ROUTES ==========
 
 // Talent Radar (for companies)
 router.get(
